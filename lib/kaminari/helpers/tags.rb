@@ -18,6 +18,7 @@ module Kaminari
         @param_name = @options.delete(:param_name)
         @theme = @options[:theme] ? "#{@options.delete(:theme)}/" : ''
         @params = @options[:params] ? template.params.merge(@options.delete :params) : template.params
+        @engine = @options.delete(:engine)
       end
 
       def to_s(locals = {}) #:nodoc:
@@ -25,7 +26,14 @@ module Kaminari
       end
 
       def page_url_for(page)
-        @template.url_for @params.merge(@param_name => (page <= 1 ? nil : page))
+        helper_container = if @engine
+                             @template.send(@engine)
+                           else
+                             @template
+                           end
+
+
+        helper_container.url_for @params.merge(@param_name => (page <= 1 ? nil : page))
       end
     end
 
